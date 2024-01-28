@@ -1,36 +1,52 @@
 #!/usr/bin/python3
 
-import math
 import sys
 import time
 
-start = time.time()
-
-def is_prime(n):
-    if n == 2:
-        return True  
-    if n % 2 == 0 or n <= 1:
+def is_prime(num):
+    if num <= 1:
         return False
-
-    sqr = int(math.sqrt(n)) + 1
-    for divisor in range(3, sqr, 2):
-        if n % divisor == 0:
+    if num <= 3:
+        return True
+    if num % 2 == 0 or num % 3 == 0:
+        return False
+    i = 5
+    while i * i <= num:
+        if num % i == 0 or num % (i + 2) == 0:
             return False
+        i += 6
     return True
 
-def get_factors(n):
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0 and is_prime(i):
-            return i, n//i
+def factorize_rsa(num):
+    for i in range(2, num + 1):
+        if num % i == 0 and is_prime(i):
+            j = num // i
+            if is_prime(j):
+                return (i, j)
+    return None
 
-if __name__ == '__main__':
-    input_file = sys.argv[1]
-    with open(input_file) as f:
-        n = int(f.read())
-        p, q = get_factors(n)
-        print(f"{n}={p}*{q}")
-
-    end = time.time()
-    if (end - start) > 5:
-        print("Time limit exceeded")   
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: rsa <file>")
         sys.exit(1)
+
+    input_file = sys.argv[1]
+
+    try:
+        with open(input_file, 'r') as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        print("File not found")
+        sys.exit(1)
+
+    start_time = time.time()
+
+    for line in lines:
+        num = int(line.strip())
+        factors = factorize_rsa(num)
+        if factors:
+            print(f"{num}={factors[0]}*{factors[1]}")
+
+        if time.time() - start_time > 5:
+            print("Time limit exceeded")
+            sys.exit(1)
