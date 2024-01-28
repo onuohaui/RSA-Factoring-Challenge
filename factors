@@ -1,20 +1,15 @@
 #!/usr/bin/python3
 
-import time
 import sys
+import time
 
-def factorize(number):
-    factors = []
-    divisor = 2
-    while divisor <= number:
-        if number % divisor == 0:
-            factors.append(divisor)
-            number //= divisor
-        else:
-            divisor += 1
-    return factors
+def factorize(num):
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            return (i, num // i)
+    return None
 
-def main():
+if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: factors <file>")
         sys.exit(1)
@@ -22,18 +17,20 @@ def main():
     input_file = sys.argv[1]
 
     try:
-        with open(input_file, "r") as file:
-            for line in file:
-                number = int(line.strip())
-                factors = factorize(number)
-                p, q = factors[0], factors[1]
-                print(f"{number}={p}*{q}")
+        with open(input_file, 'r') as f:
+            lines = f.readlines()
     except FileNotFoundError:
-        print(f"File '{input_file}' not found.")
-        sys.exit(1)
-    except ValueError:
-        print("Invalid number in the input file.")
+        print("File not found")
         sys.exit(1)
 
-if __name__ == "__main__":
-    main()
+    start_time = time.time()
+
+    for line in lines:
+        num = int(line.strip())
+        factors = factorize(num)
+        if factors:
+            print(f"{num}={factors[0]}*{factors[1]}")
+
+        if time.time() - start_time > 5:
+            print("Time limit exceeded")
+            sys.exit(1)
